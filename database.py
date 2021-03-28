@@ -45,7 +45,8 @@ class MySQLAPI:
         data = TableClass(url=url)
         self.session.add(data)
 
-    def bulk_insert_data(self, data):
+    def bulk_insert_data(self, urls):
+        data = [TableClass(url=url) for url in urls]
         self.session.bulk_save_objects(data)
 
     def delete_is_deleted_column(self):
