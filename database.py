@@ -44,15 +44,12 @@ class MySQLAPI:
     def insert_data(self, url):
         data = TableClass(url=url)
         self.session.add(data)
-        self.commit()
 
     def bulk_insert_data(self, data):
         self.session.bulk_save_objects(data)
-        self.commit()
 
     def delete_is_deleted_column(self):
         self.session.query(TableClass).filter(TableClass.is_deleted is True).delete()
-        self.commit()
 
     def close(self):
         self.session.close()
