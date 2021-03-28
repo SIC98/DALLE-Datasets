@@ -13,14 +13,13 @@ user = config['DATABASE']['USER']
 password = config['DATABASE']['PASSWORD']
 host = config['DATABASE']['HOST']
 database = config['DATABASE']['DATABASE']
-port = config['DATABASE']['PORT']
 
 Base = declarative_base()
 
 
 class MySQLAPI:
     def __init__(self):
-        self.db_url = f'mysql+mysqlconnector://{user}:{password}@{host}:{port}/{database}?charset=utf8'
+        self.db_url = f'mysql+mysqlconnector://{user}:{password}@{host}/{database}?charset=utf8'
         self.engine = create_engine(self.db_url, encoding='utf-8', pool_recycle=-1, max_overflow=0)
         session = sessionmaker(bind=self.engine)
         self.session = session()

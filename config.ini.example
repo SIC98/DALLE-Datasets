@@ -3,6 +3,5 @@
 USER=dev
 PASSWORD=password
 HOST=1.1.1.1
-PORT=22
 DATABASE=database
 TABLE=table
