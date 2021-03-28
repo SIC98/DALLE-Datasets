@@ -59,7 +59,7 @@ class MySQLAPI:
             self.session.commit()
         except Exception as e:
             self.session.rollback()
-            print('session rollback', e)
+            logging.info('session rollback', e)
             raise
 
 
