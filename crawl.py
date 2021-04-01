@@ -43,7 +43,7 @@ if __name__ == '__main__':
                         help='Minimum value for upload date of image to crawl')
     parser.add_argument('-e', '--end', type=int, default=20220000000000,
                         help='Maximum value for upload date of image to crawl')
-    parser.add_argument('-n', '--number_of_chunks', type=int, default=20, help='Number of complete self-play games')
+    parser.add_argument('-n', '--number_of_chunks', type=int, default=20, help='Number of chunks')
     parser.add_argument('-p', '--processes', type=int, default=4, help='Number of processes to crawl')
     a = parser.parse_args()
 
