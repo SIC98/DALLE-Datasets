@@ -6,8 +6,8 @@ import argparse
 
 
 def offset_to_url(offset):
-    return f'https://commons.wikimedia.org/w/index.php?title=Special:NewFiles&dir=prev&offset={offset}&limit=500&user'\
-           f'=&mediatype%5B0%5D=BITMAP&mediatype%5B1%5D=ARCHIVE&mediatype%5B2%5D=DRAWING&start=&end=&wpFormIdentifier'\
+    return f'https://commons.wikimedia.org/w/index.php?title=Special:NewFiles&dir=prev&offset={offset}&limit=500&user' \
+           f'=&mediatype%5B0%5D=BITMAP&mediatype%5B1%5D=ARCHIVE&mediatype%5B2%5D=DRAWING&start=&end=&wpFormIdentifier' \
            f'=specialnewimages'
 
 
@@ -23,7 +23,7 @@ def find_links(offset):
             if a['href'].startswith('/wiki/File:'):
                 lists.append(a['href'][11:])
 
-        db.bulk_insert_data(list(set(lists)))
+        db.bulk_insert_url(list(set(lists)))
         db.commit()
 
         for a in soup.find_all('a', href=True):
