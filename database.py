@@ -36,7 +36,7 @@ class MySQLAPI:
         if not self.engine.dialect.has_table(self.engine, table):
             Table(table, self.metadata,
                   Column('id', Integer, primary_key=True, nullable=False, autoincrement=True),
-                  Column('url', String(1000), nullable=False),
+                  Column('title', String(1000), nullable=False),
                   Column('raw_image', LargeBinary, nullable=True),
                   Column('image', LargeBinary, nullable=True),
                   Column('caption', String(1000), nullable=True))
@@ -44,12 +44,12 @@ class MySQLAPI:
             self.metadata.create_all()
             logging.info(f'new table {table} created')
 
-    def insert_url(self, url):
-        data = TableClass(url=url)
+    def insert_title(self, title):
+        data = TableClass(title=title)
         self.session.add(data)
 
-    def bulk_insert_url(self, urls):
-        data = [TableClass(url=url) for url in urls]
+    def bulk_insert_title(self, titles):
+        data = [TableClass(title=title) for title in titles]
         self.session.bulk_save_objects(data)
 
     def delete_is_deleted_column(self):
@@ -72,10 +72,10 @@ class TableClass(Base):
     __tablename__ = table
 
     id = Column(Integer(), primary_key=True)
-    url = Column(String(1000))
+    title = Column(String(1000))
     raw_image = Column(LargeBinary)
     image = Column(LargeBinary)
     caption = Column(String(1000))
 
     def __repr__(self):
-        return f'TableClass(id={self.id}, url={self.url}, caption={self.caption})'
+        return f'TableClass(id={self.id}, title={self.title}, caption={self.caption})'

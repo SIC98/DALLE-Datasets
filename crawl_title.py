@@ -23,7 +23,7 @@ def find_links(offset):
             if a['href'].startswith('/wiki/File:'):
                 lists.append(a['href'][11:])
 
-        db.bulk_insert_url(list(set(lists)))
+        db.bulk_insert_title(list(set(lists)))
         db.commit()
 
         for a in soup.find_all('a', href=True):
