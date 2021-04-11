@@ -1,5 +1,9 @@
 # DALLE-Datasets
 
+## Crawled image-caption pair dataset from Wikimedia Commons for training DALL·E
+<img width="1477" alt="스크린샷 2021-04-11 오후 8 06 43" src="https://user-images.githubusercontent.com/51232785/114301895-a32f7100-9b01-11eb-846f-200efe292850.png">
+
+
 ## Steps for crawling
 
 1. Create Cloud SQL instance for collecting crawled data
