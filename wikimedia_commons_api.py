@@ -32,6 +32,11 @@ async def fetch(url, return_type):
 
 def get_caption(res):
     soup = BeautifulSoup(res, 'html.parser')
+    captions = soup.find('div', class_='wbmi-caption-value', lang='en', dir='ltr')
+
+    if captions and captions.text != 'Add a one-line explanation of what this file represents':
+        return captions.text
+
     td = soup.find('td', class_='description')
 
     if not td:
@@ -140,7 +145,9 @@ if __name__ == '__main__':
             [
                 'Ber Chayim Temple 1923.jpg',
                 'Singapore Zoo Elephant-01 (8322881775).jpg',
-                'Bronzen_kandelaars_-_Boven-Leeuwen_-_20038982_-_RCE.jpg'
+                'Bronzen_kandelaars_-_Boven-Leeuwen_-_20038982_-_RCE.jpg',
+                'Bong_Joon-ho_FilmFest_Muenchen_04Jul2019.jpg',
+                'Santa_Comba_de_Gargantós.jpg'
             ]
         )
     )
