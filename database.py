@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-
+from wikimedia_commons_api import update_table
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -28,6 +28,29 @@ class MySQLAPI:
     def check_duplicate(self, title):
         exists = self.session.query(TableClass.id).filter_by(title=title).scalar() is not None
         return exists
+
+    @staticmethod
+    def _yield_limit(qry, pk_attr, maxrq):
+
+        firstid = None
+
+        while True:
+            q = qry
+            if firstid is not None:
+                q = qry.filter(pk_attr > firstid)
+
+            rec = q.order_by(pk_attr).limit(maxrq)
+
+            if rec.count() == 0:
+                break
+
+            yield rec
+            firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
+
+    async def update_table(self, maxrq):
+        query = self.session.query(TableClass)
+        for rec in self._yield_limit(query, TableClass.id, maxrq=maxrq):
+            await update_table(rec)
 
     def is_table_exist(self):
         return self.engine.dialect.has_table(self.engine, table)
@@ -75,6 +98,9 @@ class TableClass(Base):
     title = Column(String(1000))
     raw_image = Column(LargeBinary)
     image = Column(LargeBinary)
+    mediatype = Column(String(50))
+    mime = Column(String(50))
+    url = Column(String(1000))
     caption = Column(String(1000))
 
     def __repr__(self):
