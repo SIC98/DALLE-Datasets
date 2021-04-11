@@ -81,14 +81,14 @@ def caption_and_url(result):
     return get_caption(result), get_url(result)
 
 
-async def update_table(tables):
+async def update_table(tables, processes):
     print('Start updating table')
     titles = [table.title for table in tables]
     urls = [wikimeida_commons(title) for title in titles]
 
     results = await asyncio.gather(*[fetch(url, 'html') for url in urls])
     print('gathering finished')
-    with Pool(8) as p:
+    with Pool(processes) as p:
         results = p.map(caption_and_url, results)
     for (caption, url), table in zip(results, tables):
         table.url = url

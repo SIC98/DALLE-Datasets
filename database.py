@@ -47,12 +47,12 @@ class MySQLAPI:
             yield rec
             firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
 
-    async def update_table(self, maxrq, start_idx):
+    async def update_table(self, maxrq, start_idx, processes):
         query = self.session.query(TableClass)
         iter = 1
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq)):
             if idx >= start_idx:
-                await update_table(rec)
+                await update_table(rec, processes)
                 self.commit()
                 print('iter: ', iter)
                 iter += 1
