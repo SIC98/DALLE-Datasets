@@ -49,13 +49,12 @@ class MySQLAPI:
 
     async def update_table(self, maxrq, start_idx, end_idx, processes):
         query = self.session.query(TableClass)
-        iter = 0
+
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq)):
             if end_idx >= idx >= start_idx:
                 await update_table(rec, processes)
                 self.commit()
-                print('iter: ', iter)
-                iter += 1
+                print('index: ', idx)
 
     def is_table_exist(self):
         return self.engine.dialect.has_table(self.engine, table)
