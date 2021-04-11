@@ -3,7 +3,7 @@ import asyncio
 from bs4 import BeautifulSoup
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
-
+from multiprocessing import Pool
 
 def query_url(title):
     return f'https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&titles=File:{title}&utf8=' \
@@ -66,13 +66,19 @@ def get_url(res):
             return a['href']
 
 
+def caption_and_url(result):
+    return get_caption(result), get_url(result)
+
+
 async def update_table(tables):
+    print('Start updating table')
     titles = [table.title for table in tables]
     urls = [wikimeida_commons(title) for title in titles]
 
     results = await asyncio.gather(*[fetch(url, 'html') for url in urls])
-    results = [(get_caption(result), get_url(result)) for result in results]
-
+    print('gathering finished')
+    with Pool(8) as p:
+        results = p.map(caption_and_url, results)
     for (caption, url), table in zip(results, tables):
         table.url = url
 
