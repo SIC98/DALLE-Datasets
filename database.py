@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from wikimedia_commons_api import update_table
+from wikimedia_commons_api import update_table, update_table_using_api
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -47,10 +47,15 @@ class MySQLAPI:
             yield rec
             firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
 
-    async def update_table(self, maxrq):
+    async def update_table(self, maxrq, start_idx):
         query = self.session.query(TableClass)
-        for rec in self._yield_limit(query, TableClass.id, maxrq=maxrq):
-            await update_table(rec)
+        iter = 1
+        for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq)):
+            if idx >= start_idx:
+                await update_table(rec)
+                self.commit()
+                print('iter: ', iter)
+                iter += 1
 
     def is_table_exist(self):
         return self.engine.dialect.has_table(self.engine, table)
