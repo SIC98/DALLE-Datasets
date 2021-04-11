@@ -3,7 +3,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from wikimedia_commons_api import update_table, update_table_using_api
+from wikimedia_commons_api import update_table
 
 config = configparser.ConfigParser()
 config.read('config.ini')
