@@ -62,7 +62,7 @@ class MySQLAPI:
                   Column('title', String(1000), nullable=False),
                   Column('raw_image', LargeBinary, nullable=True),
                   Column('image', LargeBinary, nullable=True),
-                  Column('caption', String(1000), nullable=True))
+                  Column('caption', String(2000), nullable=True))
 
             self.metadata.create_all()
             logging.info(f'new table {table} created')
@@ -101,7 +101,7 @@ class TableClass(Base):
     mediatype = Column(String(50))
     mime = Column(String(50))
     url = Column(String(1000))
-    caption = Column(String(1000))
+    caption = Column(String(2000))
 
     def __repr__(self):
         return f'TableClass(id={self.id}, title={self.title}, caption={self.caption})'
