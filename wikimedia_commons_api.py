@@ -5,6 +5,7 @@ from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 from multiprocessing import Pool
 
+
 def query_url(title):
     return f'https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&titles=File:{title}&utf8=' \
            f'1&iiprop=comment|url|mediatype|mime&iilimit=1'
@@ -22,7 +23,9 @@ async def fetch(url, return_type):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as res:
             if res.status != 200:
-                print(f'response status: {res.status}')
+                print(f'response status: {res.status} | url: {url}')
+            if res.status == 404:
+                return None
             assert res.status == 200
             if return_type == 'html':
                 return await res.read()
@@ -31,6 +34,10 @@ async def fetch(url, return_type):
 
 
 def get_caption(res):
+
+    if not res:
+        return None
+
     soup = BeautifulSoup(res, 'html.parser')
     captions = soup.find('div', class_='wbmi-caption-value', lang='en', dir='ltr')
 
@@ -60,6 +67,10 @@ def get_caption(res):
 
 
 def get_url(res):
+
+    if not res:
+        return None
+
     soup = BeautifulSoup(res, 'html.parser')
     for a in soup.find_all('a', href=True):
         if a['href'].startswith('https://upload.wikimedia.org/wikipedia/commons'):
