@@ -1,8 +1,6 @@
 import aiohttp
 import asyncio
 from bs4 import BeautifulSoup
-import requests
-import json
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 
@@ -24,15 +22,15 @@ async def fetch(url, return_type):
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as res:
             if res.status != 200:
-                print(res.status)
+                print(f'response status: {res.status}')
             assert res.status == 200
             if return_type == 'html':
                 return await res.read()
-            elif return_type =='json':
+            elif return_type == 'json':
                 return await res.json()
 
 
-def get_url(res):
+def get_caption(res):
     soup = BeautifulSoup(res, 'html.parser')
     td = soup.find('td', class_='description')
 
@@ -51,12 +49,12 @@ def get_url(res):
         if detect(td.text) == 'en':
             return td.text.strip()
     except LangDetectException:
-        print(td.text)
+        print(f"Can't detect language type of caption | caption: {td.text}")
     finally:
         return None
 
 
-def get_caption(res):
+def get_url(res):
     soup = BeautifulSoup(res, 'html.parser')
     for a in soup.find_all('a', href=True):
         if a['href'].startswith('https://upload.wikimedia.org/wikipedia/commons'):
@@ -72,9 +70,33 @@ async def update_table(tables):
 
     for (caption, url), table in zip(results, tables):
         table.url = url
+
         if caption and len(caption) > 2000:
-            print(table.title)
-        table.caption = caption[:2000] if caption else caption
+            new_caption = caption.split('\n')[0]
+            print(f'Caption is Too long | Splited caption: {new_caption}')
+            if len(new_caption) > 2000:
+                raise Exception(f'Too long caption\n title: {table.title}\n caption: {caption}')
+            else:
+                caption = new_caption
+        table.caption = caption
+
+
+async def test_update_table(titles):
+    urls = [wikimeida_commons(title) for title in titles]
+
+    results = await asyncio.gather(*[fetch(url, 'html') for url in urls])
+    results = [(get_caption(result), get_url(result)) for result in results]
+
+    for caption, url in results:
+
+        if caption and len(caption) > 2000:
+            new_caption = caption.split('\n')[0]
+            print(f'Caption is Too long | Splited caption: {new_caption}')
+            if len(new_caption) > 2000:
+                raise Exception(f'Too long caption\n caption: {caption}')
+            else:
+                caption = new_caption
+        print(f'caption: {caption}')
 
 
 async def update_table_using_api(tables):
@@ -90,25 +112,35 @@ async def update_table_using_api(tables):
     query_results = [next(iter(result['query']['pages'].values())) for result in query_results]
 
     for parse_result, query_result, table in zip(parse_results, query_results, tables):
-
         table.url = query_result['imageinfo'][0]['url']
         table.mediatype = query_result['imageinfo'][0]['mediatype']
         table.mime = query_result['imageinfo'][0]['mime']
         if '{{en|1=' in parse_result:
-            table.caption = parse_result.split('{{en|1=')[-1].split('}}')[0]
+            caption = parse_result.split('{{en|1=')[-1].split('}}')[0]
         elif '|Description=' in parse_result:
-            table.caption = parse_result.split('|Description=')[-1].split('|')[0].strip()
+            caption = parse_result.split('|Description=')[-1].split('|')[0].strip()
+        elif '|description=' in parse_result:
+            caption = parse_result.split('|description=')[-1].split('|')[0].strip()
         else:
-            table.caption = None
+            caption = None
+
+        if caption and len(caption) > 2000:
+            new_caption = caption.split('\n')[0]
+            if len(new_caption) > 2000:
+                raise Exception(f'Too long caption\n title: {table.title}\n caption: {caption}')
+            else:
+                caption = new_caption
+        table.caption = caption
 
 
 if __name__ == '__main__':
 
     asyncio.run(
-        update_table(
+        test_update_table(
             [
-                wikimeida_commons('Ber Chayim Temple 1923.jpg'),
-                wikimeida_commons('Singapore Zoo Elephant-01 (8322881775).jpg')
+                'Ber Chayim Temple 1923.jpg',
+                'Singapore Zoo Elephant-01 (8322881775).jpg',
+                'Bronzen_kandelaars_-_Boven-Leeuwen_-_20038982_-_RCE.jpg'
             ]
         )
     )
