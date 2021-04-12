@@ -62,8 +62,12 @@ class MySQLAPI:
                 await update_table(rec, processes)
                 self.commit()
                 print(f'index: {idx + start_idx} | time taken: {datetime.now() - now}')
+                with open('log.txt', 'a') as f:
+                    print(f'index: {idx + start_idx} | time taken: {datetime.now() - now}', file=f)
             else:
                 print(f'index: {idx + start_idx} | finish!')
+                with open('log.txt', 'a') as f:
+                    print(f'index: {idx + start_idx} | time taken: {datetime.now() - now}', file=f)
                 break
 
             now = datetime.now()
