@@ -97,7 +97,8 @@ async def update_table(tables, processes):
             new_caption = caption.split('\n')[0]
             print(f'Caption is Too long | Splited caption: {new_caption}')
             if len(new_caption) > 2000:
-                raise Exception(f'Too long caption\n title: {table.title}\n caption: {caption}')
+                print(f'Too long caption\n title: {table.title}\n caption: {caption}')
+                caption = None
             else:
                 caption = new_caption
         table.caption = caption
