@@ -1,4 +1,5 @@
 import configparser
+from datetime import datetime
 import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
@@ -50,13 +51,16 @@ class MySQLAPI:
     async def update_table(self, maxrq, start_idx, end_idx, processes):
         query = self.session.query(TableClass)
 
+        now = datetime.now()
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq)):
             if end_idx >= idx >= start_idx:
                 await update_table(rec, processes)
                 self.commit()
-                print('index: ', idx)
+                print(f'index: {idx} | time taken: {datetime.now() - now}')
             else:
-                print('skip index: ', idx)
+                print(f'skip index: {idx} | time taken: {datetime.now() - now}')
+
+            now = datetime.now()
 
     def is_table_exist(self):
         return self.engine.dialect.has_table(self.engine, table)
