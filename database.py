@@ -19,7 +19,7 @@ Base = declarative_base()
 
 class MySQLAPI:
     def __init__(self):
-        self.db_url = f'mysql+mysqlconnector://{user}:{password}@{host}/{database}?charset=utf8'
+        self.db_url = f'mysql+mysqlconnector://{user}:{password}@{host}/{database}?charset=utf8mb4'
         self.engine = create_engine(self.db_url, encoding='utf-8', pool_recycle=-1, max_overflow=0)
         session = sessionmaker(bind=self.engine)
         self.session = session()
@@ -55,6 +55,8 @@ class MySQLAPI:
                 await update_table(rec, processes)
                 self.commit()
                 print('index: ', idx)
+            else:
+                print('skip index: ', idx)
 
     def is_table_exist(self):
         return self.engine.dialect.has_table(self.engine, table)
