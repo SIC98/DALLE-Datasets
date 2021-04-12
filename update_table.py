@@ -1,11 +1,8 @@
 import asyncio
 import argparse
 from database import MySQLAPI
-import sys
 
 if __name__ == '__main__':
-
-    sys.stdout = open("log.txt", "w")
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--bulk', type=int, default=800)
@@ -18,5 +15,3 @@ if __name__ == '__main__':
     asyncio.run(db.update_table(a.bulk, start_idx=a.start_idx, end_idx=a.end_idx, processes=a.processes))
     db.commit()
     db.close()
-
-    sys.stdout.close()
