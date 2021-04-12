@@ -31,9 +31,14 @@ class MySQLAPI:
         return exists
 
     @staticmethod
-    def _yield_limit(qry, pk_attr, maxrq):
+    def _yield_limit(qry, pk_attr, maxrq, skip):
 
-        firstid = None
+        if skip == 0:
+            firstid = None
+        else:
+            q = qry
+            rec = q.order_by(pk_attr).limit(1).offset(skip-1)
+            firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
 
         while True:
             q = qry
@@ -52,13 +57,14 @@ class MySQLAPI:
         query = self.session.query(TableClass)
 
         now = datetime.now()
-        for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq)):
-            if end_idx >= idx >= start_idx:
+        for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
+            if (end_idx - start_idx) > idx >= 0:
                 await update_table(rec, processes)
                 self.commit()
-                print(f'index: {idx} | time taken: {datetime.now() - now}')
+                print(f'index: {idx + start_idx} | time taken: {datetime.now() - now}')
             else:
-                print(f'skip index: {idx} | time taken: {datetime.now() - now}')
+                print(f'index: {idx + start_idx} | finish!')
+                break
 
             now = datetime.now()
 
