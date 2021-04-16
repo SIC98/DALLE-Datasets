@@ -1,10 +1,11 @@
 import configparser
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from wikimedia_commons_api import update_table
+import time
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -53,7 +54,7 @@ class MySQLAPI:
             yield rec
             firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
 
-    async def update_table(self, maxrq, start_idx, end_idx, processes):
+    async def update_table(self, maxrq, start_idx, end_idx, processes, seconds):
         query = self.session.query(TableClass)
 
         now = datetime.now()
@@ -61,7 +62,13 @@ class MySQLAPI:
             if (end_idx - start_idx) > idx >= 0:
                 await update_table(rec, processes)
                 self.commit()
-                print(f'index: {idx + start_idx} | time taken: {datetime.now() - now}')
+                loop_time = datetime.now() - now
+                print(f'index: {idx + start_idx} | time taken: {loop_time}')
+                remain_seconds = (timedelta(seconds=seconds) - loop_time).total_seconds()
+                if remain_seconds > 0:
+                    time.sleep(remain_seconds)
+                    print(f'sleep: {remain_seconds}')
+
             else:
                 print(f'index: {idx + start_idx} | finish!')
                 break
