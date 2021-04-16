@@ -23,7 +23,8 @@ async def fetch(url, return_type):
     async with aiohttp.ClientSession(
         connector=aiohttp.TCPConnector(
             verify_ssl=False
-        )
+        ),
+        trust_env=True
     ) as session:
         async with session.get(url) as res:
             if res.status != 200:
