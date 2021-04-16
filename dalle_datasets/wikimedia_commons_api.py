@@ -32,7 +32,7 @@ async def fetch(url, return_type):
             if res.status == 404:
                 return None
             assert res.status == 200
-            if return_type == 'html':
+            if return_type == 'read':
                 return await res.read()
             elif return_type == 'json':
                 return await res.json()
@@ -91,7 +91,7 @@ async def update_table(tables, processes):
     titles = [table.title for table in tables]
     urls = [wikimeida_commons(title) for title in titles]
 
-    results = await asyncio.gather(*[fetch(url, 'html') for url in urls])
+    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
     print('gathering finished')
     with Pool(processes) as p:
         results = p.map(caption_and_url, results)
@@ -109,10 +109,20 @@ async def update_table(tables, processes):
         table.caption = caption
 
 
+async def crawl_image(tables):
+    print('Start updating table')
+    urls = [table.url for table in tables]
+
+    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
+    print('gathering finished')
+    for raw_image, table in zip(results, tables):
+        table.raw_image = raw_image
+
+
 async def test_update_table(titles):
     urls = [wikimeida_commons(title) for title in titles]
 
-    results = await asyncio.gather(*[fetch(url, 'html') for url in urls])
+    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
     results = [(get_caption(result), get_url(result)) for result in results]
 
     for caption, url in results:
