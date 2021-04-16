@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from wikimedia_commons_api import update_table
+from wikimedia_commons_api import crawl_image, update_table
 import time
 
 config = configparser.ConfigParser()
@@ -61,6 +61,27 @@ class MySQLAPI:
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
             if (end_idx - start_idx) > idx >= 0:
                 await update_table(rec, processes)
+                self.commit()
+                loop_time = datetime.now() - now
+                print(f'index: {idx + start_idx} | time taken: {loop_time}')
+                remain_seconds = (timedelta(seconds=seconds) - loop_time).total_seconds()
+                if remain_seconds > 0:
+                    time.sleep(remain_seconds)
+                    print(f'sleep: {remain_seconds}')
+
+            else:
+                print(f'index: {idx + start_idx} | finish!')
+                break
+
+            now = datetime.now()
+
+    async def crawl_image(self, maxrq, start_idx, end_idx, seconds):
+        query = self.session.query(TableClass)
+
+        now = datetime.now()
+        for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
+            if (end_idx - start_idx) > idx >= 0:
+                await crawl_image(rec)
                 self.commit()
                 loop_time = datetime.now() - now
                 print(f'index: {idx + start_idx} | time taken: {loop_time}')
