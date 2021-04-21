@@ -49,6 +49,7 @@ class MySQLAPI:
             rec = q.order_by(pk_attr).limit(maxrq)
 
             if rec.count() == 0:
+                print('finish!')
                 break
 
             yield rec
