@@ -22,12 +22,7 @@ def wikimeida_commons(title):
 
 
 async def curl(url, return_type):
-    async with aiohttp.ClientSession(
-        connector=aiohttp.TCPConnector(
-            verify_ssl=False
-        ),
-        trust_env=True
-    ) as session:
+    async with aiohttp.ClientSession() as session:
         async with session.get(url) as res:
             if res.status != 200:
                 print(f'response status: {res.status} | url: {url}')
