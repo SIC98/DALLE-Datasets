@@ -61,7 +61,7 @@ class MySQLAPI:
         now = datetime.now()
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
             if (end_idx - start_idx) > idx >= 0:
-                await update_table(rec, processes)
+                await update_table(rec, processes, seconds)
                 self.commit()
                 loop_time = datetime.now() - now
                 print(f'index: {idx + start_idx} | time taken: {loop_time}')
@@ -82,7 +82,7 @@ class MySQLAPI:
         now = datetime.now()
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
             if (end_idx - start_idx) > idx >= 0:
-                await crawl_image(rec)
+                await crawl_image(rec, seconds)
                 self.commit()
                 loop_time = datetime.now() - now
                 print(f'index: {idx + start_idx} | time taken: {loop_time}')

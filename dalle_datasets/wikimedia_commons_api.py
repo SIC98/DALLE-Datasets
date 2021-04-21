@@ -1,9 +1,11 @@
 import aiohttp
+from aiohttp.client_exceptions import ClientConnectorError, ClientPayloadError
 import asyncio
 from bs4 import BeautifulSoup
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 from multiprocessing import Pool
+import time
 
 
 def query_url(title):
@@ -19,7 +21,7 @@ def wikimeida_commons(title):
     return f'https://commons.wikimedia.org/wiki/File:{title}'
 
 
-async def fetch(url, return_type):
+async def curl(url, return_type):
     async with aiohttp.ClientSession(
         connector=aiohttp.TCPConnector(
             verify_ssl=False
@@ -36,6 +38,16 @@ async def fetch(url, return_type):
                 return await res.read()
             elif return_type == 'json':
                 return await res.json()
+
+
+async def try_curl_until_no_error(urls, return_type, seconds):
+    while True:
+        try:
+            return await asyncio.gather(*[curl(url, return_type) for url in urls])
+        except (AssertionError, ClientConnectorError, ClientPayloadError):
+            time.sleep(seconds)
+            print(f'sleep: {seconds}')
+            pass
 
 
 def get_caption(res):
@@ -86,12 +98,12 @@ def caption_and_url(result):
     return get_caption(result), get_url(result)
 
 
-async def update_table(tables, processes):
+async def update_table(tables, processes, seconds):
     print('Start updating table')
     titles = [table.title for table in tables]
     urls = [wikimeida_commons(title) for title in titles]
 
-    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
+    results = await try_curl_until_no_error(urls, 'read', seconds)
     print('gathering finished')
     with Pool(processes) as p:
         results = p.map(caption_and_url, results)
@@ -109,20 +121,20 @@ async def update_table(tables, processes):
         table.caption = caption
 
 
-async def crawl_image(tables):
-    print('Start updating table')
+async def crawl_image(tables, seconds):
+    print('Start crawling images')
     urls = [table.url for table in tables]
 
-    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
+    results = await try_curl_until_no_error(urls, 'read', seconds)
     print('gathering finished')
     for raw_image, table in zip(results, tables):
         table.raw_image = raw_image
 
 
-async def test_update_table(titles):
+async def test_update_table(titles, seconds):
     urls = [wikimeida_commons(title) for title in titles]
 
-    results = await asyncio.gather(*[fetch(url, 'read') for url in urls])
+    results = await try_curl_until_no_error(urls, 'read', seconds)
     results = [(get_caption(result), get_url(result)) for result in results]
 
     for caption, url in results:
@@ -137,12 +149,12 @@ async def test_update_table(titles):
         print(f'caption: {caption}')
 
 
-async def update_table_using_api(tables):
+async def update_table_using_api(tables, seconds):
 
     titles = [table.title for table in tables]
     urls = [f(title) for title in titles for f in (parse_url, query_url)]
 
-    results = await asyncio.gather(*[fetch(url, 'json') for url in urls])
+    results = await try_curl_until_no_error(urls, 'json', seconds)
     parse_results = results[::2]
     query_results = results[1::2]
 
@@ -181,6 +193,7 @@ if __name__ == '__main__':
                 'Bronzen_kandelaars_-_Boven-Leeuwen_-_20038982_-_RCE.jpg',
                 'Bong_Joon-ho_FilmFest_Muenchen_04Jul2019.jpg',
                 'Santa_Comba_de_Gargantós.jpg'
-            ]
+            ],
+            seconds=60
         )
     )
