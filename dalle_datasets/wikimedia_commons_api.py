@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 from langdetect import detect
 from langdetect.lang_detect_exception import LangDetectException
 from multiprocessing import Pool
+from preprocess_image import reshape_image
 import time
 
 
@@ -128,6 +129,8 @@ async def crawl_image(tables, seconds):
 
     results = await try_curl_until_no_error(urls, 'read', seconds)
     print('gathering finished')
+
+    results = [reshape_image(result) for result in results]
     for raw_image, table in zip(results, tables):
         table.raw_image = raw_image
 
