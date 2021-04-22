@@ -4,3 +4,4 @@ langdetect==1.0.8
 mysql-connector-python==8.0.23
 requests==2.25.1
 SQLAlchemy==1.4.8
+tensorflow==2.4.1
