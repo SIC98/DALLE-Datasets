@@ -166,12 +166,10 @@ class TableClass(Base):
 
     id = Column(Integer(), primary_key=True)
     title = Column(String(1000))
-    raw_image = Column(LargeBinary)
     image = Column(LargeBinary)
-    mediatype = Column(String(50))
     mime = Column(String(50))
     url = Column(String(1000))
     caption = Column(String(2000))
 
     def __repr__(self):
-        return f'TableClass(id={self.id}, title={self.title}, caption={self.caption})'
+        return f'TableClass(id={self.id}, title={self.title}, mime={self.mime}, url={self.url}, caption={self.caption})'
