@@ -1,8 +1,7 @@
-import asyncio
 import numpy as np
+import requests
 import sys
 import tensorflow as tf
-from wikimedia_commons_api import curl
 
 
 def reshape_image(img: bytes, target_res: int = 256) -> bytes:
@@ -38,17 +37,11 @@ def reshape_image(img: bytes, target_res: int = 256) -> bytes:
     return tf.image.random_crop(img, 2 * [target_res] + [channel_count]).numpy().tobytes()
 
 
-async def test_reshape_image():
-    images = await asyncio.gather(
-        *[
-            curl(url, 'read') for url in [
-                'https://upload.wikimedia.org/wikipedia/commons/3/33/ISS_Propulsion_module.jpg',
-                'https://upload.wikimedia.org/wikipedia/commons/b/b7/Tartar.jpg'
-            ]
-        ]
-    )
+def test_reshape_image(url):
 
-    reshaped_image = reshape_image(images[0])
+    image = requests.get(url).content
+
+    reshaped_image = reshape_image(image)
     print(f'size: {sys.getsizeof(reshaped_image)} bytes')
 
     array = np.frombuffer(reshaped_image, dtype=np.uint8).reshape(256, 256, 3)
@@ -62,4 +55,4 @@ async def test_reshape_image():
 
 if __name__ == '__main__':
 
-    asyncio.run(test_reshape_image())
+    test_reshape_image(url='https://upload.wikimedia.org/wikipedia/commons/b/b7/Tartar.jpg')
