@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from wikimedia_commons_api import crawl_image, update_table
+from wikimedia_commons_api import crawl_image, crawl_caption
 import time
 
 config = configparser.ConfigParser()
@@ -55,13 +55,13 @@ class MySQLAPI:
             yield rec
             firstid = pk_attr.__get__(rec[-1], pk_attr) if rec else None
 
-    async def update_table(self, maxrq, start_idx, end_idx, processes, seconds):
+    async def crawl_caption(self, maxrq, start_idx, end_idx, processes, seconds):
         query = self.session.query(TableClass)
 
         now = datetime.now()
         for idx, rec in enumerate(self._yield_limit(query, TableClass.id, maxrq=maxrq, skip=start_idx * maxrq)):
             if (end_idx - start_idx) > idx >= 0:
-                await update_table(rec, processes, seconds)
+                await crawl_caption(rec, processes, seconds)
                 self.commit()
                 loop_time = datetime.now() - now
                 print(f'index: {idx + start_idx} | time taken: {loop_time}')

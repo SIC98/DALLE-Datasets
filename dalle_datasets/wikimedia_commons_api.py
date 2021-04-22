@@ -93,7 +93,7 @@ def caption_and_url(result):
     return get_caption(result), get_url(result)
 
 
-async def update_table(tables, processes, seconds):
+async def crawl_caption(tables, processes, seconds):
     print('Start updating table')
     titles = [table.title for table in tables]
     urls = [wikimeida_commons(title) for title in titles]
@@ -126,7 +126,7 @@ async def crawl_image(tables, seconds):
         table.raw_image = raw_image
 
 
-async def test_update_table(titles, seconds):
+async def test_crawl_caption(titles, seconds):
     urls = [wikimeida_commons(title) for title in titles]
 
     results = await try_curl_until_no_error(urls, 'read', seconds)
@@ -144,7 +144,7 @@ async def test_update_table(titles, seconds):
         print(f'caption: {caption}')
 
 
-async def update_table_using_api(tables, seconds):
+async def crawl_caption_using_api(tables, seconds):
 
     titles = [table.title for table in tables]
     urls = [f(title) for title in titles for f in (parse_url, query_url)]
@@ -181,7 +181,7 @@ async def update_table_using_api(tables, seconds):
 if __name__ == '__main__':
 
     asyncio.run(
-        test_update_table(
+        test_crawl_caption(
             [
                 'Ber Chayim Temple 1923.jpg',
                 'Singapore Zoo Elephant-01 (8322881775).jpg',

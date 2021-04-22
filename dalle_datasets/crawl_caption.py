@@ -13,6 +13,6 @@ if __name__ == '__main__':
     a = parser.parse_args()
 
     db = MySQLAPI()
-    asyncio.run(db.update_table(a.bulk, start_idx=a.start_idx, end_idx=a.end_idx, processes=a.processes, seconds=a.seconds))
+    asyncio.run(db.crawl_caption(a.bulk, start_idx=a.start_idx, end_idx=a.end_idx, processes=a.processes, seconds=a.seconds))
     db.commit()
     db.close()
