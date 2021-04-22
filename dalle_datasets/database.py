@@ -1,10 +1,12 @@
+from bs4 import BeautifulSoup
 import configparser
 from datetime import datetime, timedelta
 import logging
+import requests
 from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from wikimedia_commons_api import crawl_image, crawl_caption
+from wikimedia_commons_api import crawl_image, crawl_caption, offset_to_url
 import time
 
 config = configparser.ConfigParser()
@@ -30,6 +32,28 @@ class MySQLAPI:
     def check_duplicate(self, title):
         exists = self.session.query(TableClass.id).filter_by(title=title).scalar() is not None
         return exists
+
+    def find_links(self, offset):
+
+        start_offset, end_offset = offset
+
+        while start_offset < end_offset:
+            res = requests.get(offset_to_url(start_offset))
+            soup = BeautifulSoup(res.content, 'html.parser')
+            lists = []
+            for a in soup.find_all('a', href=True):
+                if a['href'].startswith('/wiki/File:'):
+                    lists.append(a['href'][11:])
+
+            self.bulk_insert_title(list(set(lists)))
+            self.commit()
+
+            for a in soup.find_all('a', href=True):
+                if a['href'].startswith('/w/index.php?title=Special:NewFiles') and 'limit=500' in a['href'] and \
+                        'offset' in a['href'] and 'dir=prev' in a['href']:
+                    if a['href'][52:66] != start_offset:
+                        start_offset = a['href'][52:66]
+                        break
 
     @staticmethod
     def _yield_limit(qry, pk_attr, maxrq, skip):

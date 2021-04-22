@@ -8,6 +8,12 @@ from multiprocessing import Pool
 import time
 
 
+def offset_to_url(offset):
+    return f'https://commons.wikimedia.org/w/index.php?title=Special:NewFiles&dir=prev&offset={offset}&limit=500&user' \
+           f'=&mediatype%5B0%5D=BITMAP&mediatype%5B1%5D=ARCHIVE&mediatype%5B2%5D=DRAWING&start=&end=&wpFormIdentifier' \
+           f'=specialnewimages'
+
+
 def query_url(title):
     return f'https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=imageinfo&titles=File:{title}&utf8=' \
            f'1&iiprop=comment|url|mediatype|mime&iilimit=1'
