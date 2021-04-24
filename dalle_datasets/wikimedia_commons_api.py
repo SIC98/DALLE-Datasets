@@ -8,6 +8,16 @@ from multiprocessing import Pool
 from preprocess_image import reshape_image
 import time
 
+url_to_mime = {
+    'png': 'image/png',
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'gif': 'image/gif',
+    'bmp': 'image/bmp',
+    'svg': 'image/svg+xml',
+    'tif': 'image/tiff'
+}
+
 
 def offset_to_url(offset):
     return f'https://commons.wikimedia.org/w/index.php?title=Special:NewFiles&dir=prev&offset={offset}&limit=500&user' \
@@ -111,6 +121,7 @@ async def crawl_caption(tables, processes, seconds):
         results = p.map(caption_and_url, results)
     for (caption, url), table in zip(results, tables):
         table.url = url
+        table.mime = url_to_mime[url.split('.')[-1].lower()]
 
         if caption and len(caption) > 2000:
             new_caption = caption.split('\n')[0]
