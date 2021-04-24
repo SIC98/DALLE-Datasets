@@ -129,8 +129,8 @@ class MySQLAPI:
             Table(table, self.metadata,
                   Column('id', Integer, primary_key=True, nullable=False, autoincrement=True),
                   Column('title', String(1000), nullable=False),
-                  Column('raw_image', LargeBinary, nullable=True),
                   Column('image', LargeBinary, nullable=True),
+                  Column('mime', String(50), nullable=True),
                   Column('url', String(1000), nullable=True),
                   Column('caption', String(2000), nullable=True)),
 
