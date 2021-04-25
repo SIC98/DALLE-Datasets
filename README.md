@@ -12,20 +12,20 @@
 
 3. Install requirenemts.txt dependencies
 
-```
+```bash
 pip install -r requirements.txt
 ``` 
 
 4. Create table
 
-```
+```bash
 python dalle_datasets/create_table.py
 ```
 
 5. Check the table structure
 
 ```mysql
-DESC $table
+DESC $table;
 ```
 ```
 +---------+---------------+------+-----+---------+----------------+
@@ -42,7 +42,7 @@ DESC $table
 
 6. Crawl title
 
-```
+```bash
 python dalle_datasets/crawl_title.py
 ```
 
@@ -62,9 +62,20 @@ SELECT COUNT(*) from $table;
 
 8. Crawl image url and caption
 
-```
+```bash
 python dalle_datasets/crawl_caption.py
 ```
+
+This script takes too long to run on only one machine. So I split the task into 10 gcp instances.
+
+For example, if you number each instance from 0 to 9 as variable i, you can run the script for each instance as shown below.
+
+```bash
+# start = 7879 * i
+# end = 7879 * (i+1)
+python dalle_datasets/crawl_caption.py -s $start -e $end
+```
+
 
 9. Delete row with `NULL` caption
 
@@ -79,4 +90,24 @@ SELECT COUNT(*) from $table;
 +----------+
 | 30246704 |
 +----------+
+```
+
+10. Selecting `mime` column in group by
+
+```mysql
+SELECT mime, COUNT(mime) AS count FROM $table GROUP BY mime;
+```
+
+```
++---------------+----------+
+| mime          | count    |
++---------------+----------+
+| image/png     |  1469744 |
+| image/jpeg    | 27229537 |
+| image/svg+xml |  1089487 |
+| image/gif     |    71366 |
+| image/tiff    |   383288 |
+| image/x-xcf   |      680 |
+| image/webp    |     2602 |
++---------------+----------+
 ```
