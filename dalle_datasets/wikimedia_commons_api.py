@@ -15,7 +15,10 @@ url_to_mime = {
     'gif': 'image/gif',
     'bmp': 'image/bmp',
     'svg': 'image/svg+xml',
-    'tif': 'image/tiff'
+    'tif': 'image/tiff',
+    'tiff': 'image/tiff',
+    'xcf': 'image/x-xcf',
+    'webp': 'image/webp'
 }
 
 
