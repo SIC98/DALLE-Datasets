@@ -1,6 +1,6 @@
 # DALLE-Datasets
 
-## Crawled image-caption pair dataset from Wikimedia Commons for training DALL·E
+## Crawling image-caption pair dataset from Wikimedia Commons for training DALL·E
 
 <img width="1477" alt="스크린샷 2021-04-11 오후 8 06 43" src="https://user-images.githubusercontent.com/51232785/114301895-a32f7100-9b01-11eb-846f-200efe292850.png">
 
@@ -13,7 +13,7 @@
 
 - id: unique identifier
 - title: file name. Information of file: `https://commons.wikimedia.org/wiki/File:$title`
-- mime: `image/png`, `image/jpeg`, `image/svg+xml`, `image/gif`, `image/tiff`, `image/x-xcf` or `image/webp`
+- mime: `image/png`, `image/jpeg`, `image/svg+xml`, `image/gif`, `image/tiff`, `image/x-xcf`, or `image/webp`
 - url: can downlaod image from `url`
 - caption: caption of iamge
 
@@ -45,11 +45,11 @@ DESC $table;
 | Field   | Type          | Null | Key | Default | Extra          |
 +---------+---------------+------+-----+---------+----------------+
 | id      | int(11)       | NO   | PRI | NULL    | auto_increment |
-| title   | varchar(1000) | YES  |     | NULL    |                |
+| title   | varchar(1000) | NO   |     | NULL    |                |
 | image   | mediumblob    | YES  |     | NULL    |                |
 | mime    | varchar(50)   | YES  |     | NULL    |                |
 | url     | varchar(1000) | YES  |     | NULL    |                |
-| caption | text          | YES  |     | NULL    |                |
+| caption | varchar(2000) | YES  |     | NULL    |                |
 +---------+---------------+------+-----+---------+----------------+
 ```
 
