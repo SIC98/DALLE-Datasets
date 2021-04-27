@@ -1,8 +1,21 @@
 # DALLE-Datasets
 
 ## Crawled image-caption pair dataset from Wikimedia Commons for training DALL·E
+
 <img width="1477" alt="스크린샷 2021-04-11 오후 8 06 43" src="https://user-images.githubusercontent.com/51232785/114301895-a32f7100-9b01-11eb-846f-200efe292850.png">
 
+## Download data
+
+- Download link: [wikimedia_commons.csv](https://drive.google.com/file/d/1_plT6RgEiag6IqepKMJphq2wyxnc5hI5/view?usp=sharing)
+- File size: 8.42GB
+
+### File summary
+
+- id: unique identifier
+- title: file name. Information of file: `https://commons.wikimedia.org/wiki/File:$title`
+- mime: `image/png`, `image/jpeg`, `image/svg+xml`, `image/gif`, `image/tiff`, `image/x-xcf` or `image/webp`
+- url: can downlaod image from `url`
+- caption: caption of iamge
 
 ## Steps for crawling
 
@@ -49,7 +62,7 @@ python dalle_datasets/crawl_title.py
 7. Check the number of rows in the table
 
 ```mysql
-SELECT COUNT(*) from $table;
+SELECT count(*) FROM $table;
 ```
 
 ```
@@ -81,7 +94,7 @@ python dalle_datasets/crawl_caption.py -s $start -e $end
 
 ```mysql
 DELETE FROM $table WHERE caption IS NULL;
-SELECT COUNT(*) from $table;
+SELECT count(*) FROM $table;
 ```
 
 ```
@@ -95,7 +108,7 @@ SELECT COUNT(*) from $table;
 10. Selecting `mime` column in group by
 
 ```mysql
-SELECT mime, COUNT(mime) AS count FROM $table GROUP BY mime;
+SELECT mime, count(mime) AS count FROM $table GROUP BY mime;
 ```
 
 ```
@@ -110,4 +123,10 @@ SELECT mime, COUNT(mime) AS count FROM $table GROUP BY mime;
 | image/x-xcf   |      680 |
 | image/webp    |     2602 |
 +---------------+----------+
+```
+
+11. Crawl image
+
+```bash
+python dalle_datasets/crawl_image.py
 ```
