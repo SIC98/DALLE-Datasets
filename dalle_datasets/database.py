@@ -1,9 +1,8 @@
 from bs4 import BeautifulSoup
 import configparser
 from datetime import datetime, timedelta
-import logging
 import requests
-from sqlalchemy import create_engine, Column, Integer, LargeBinary, MetaData, String, Table
+from sqlalchemy import create_engine, Column, inspect, Integer, LargeBinary, MetaData, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from wikimedia_commons_api import crawl_image, crawl_caption, offset_to_url
@@ -125,17 +124,17 @@ class MySQLAPI:
         return self.engine.dialect.has_table(self.engine, table)
 
     def create_table_if_not_exist(self):
-        if not self.engine.dialect.has_table(self.engine, table):
+        if not inspect(self.engine).has_table(table):
             Table(table, self.metadata,
                   Column('id', Integer, primary_key=True, nullable=False, autoincrement=True),
                   Column('title', String(1000), nullable=False),
-                  Column('image', LargeBinary, nullable=True),
+                  Column('image', LargeBinary(length=(2**24)-1), nullable=True),
                   Column('mime', String(50), nullable=True),
                   Column('url', String(1000), nullable=True),
                   Column('caption', String(2000), nullable=True)),
 
             self.metadata.create_all()
-            logging.info(f'new table {table} created')
+            print(f'new table {table} created')
 
     def insert_title(self, title):
         data = TableClass(title=title)
@@ -156,7 +155,7 @@ class MySQLAPI:
             self.session.commit()
         except Exception as e:
             self.session.rollback()
-            logging.info('session rollback', e)
+            print('session rollback', e)
             raise
 
 
