@@ -4,7 +4,9 @@
 
 <img width="1477" alt="스크린샷 2021-04-11 오후 8 06 43" src="https://user-images.githubusercontent.com/51232785/114301895-a32f7100-9b01-11eb-846f-200efe292850.png">
 
-## Download data
+## 📚 Data
+
+### Download data
 
 - Download link: [wikimedia_commons.csv](https://drive.google.com/file/d/1_plT6RgEiag6IqepKMJphq2wyxnc5hI5/view?usp=sharing)
 - File size: 8.42GB
@@ -12,12 +14,26 @@
 ### File summary
 
 - id: unique identifier
-- title: file name. Information of file: `https://commons.wikimedia.org/wiki/File:$title`
+- title: name of image. Detail information of image: `https://commons.wikimedia.org/wiki/File:$title`
 - mime: `image/png`, `image/jpeg`, `image/svg+xml`, `image/gif`, `image/tiff`, `image/x-xcf`, or `image/webp`
 - url: can downlaod image from `url`
 - caption: caption of iamge
 
-## Steps for crawling
+### Head of file
+
+```bash
+head -n 5 wikimedia_commons.csv
+```
+
+```
+id,title,mime,url,caption
+5637467,Ph_locator_cotabato_carmen.png,image/png,https://upload.wikimedia.org/wikipedia/commons/a/a8/Ph_locator_cotabato_carmen.png,Map of the Cotabato showing the location of Carmen
+5637468,Ph_locator_tarlac_san_clemente.png,image/png,https://upload.wikimedia.org/wikipedia/commons/2/27/Ph_locator_tarlac_san_clemente.png,Map of Tarlac showing the location of San Clemente
+5637470,Ph_locator_sultan_kudarat_isulan.png,image/png,https://upload.wikimedia.org/wikipedia/commons/d/d7/Ph_locator_sultan_kudarat_isulan.png,Map of the Sultan Kudarat showing the location of Isulan
+5637471,Ph_locator_lanao_del_sur_balabagan.png,image/png,https://upload.wikimedia.org/wikipedia/commons/d/d4/Ph_locator_lanao_del_sur_balabagan.png,Map of the Lanao del Sur showing the location of Balabagan
+```
+
+## ⚗️ Steps for crawling
 
 1. Use `mysql` to store crawled data
 
