@@ -2,14 +2,17 @@ import numpy as np
 import requests
 import sys
 import tensorflow as tf
+from typing import Union
 
 
-def reshape_image(img: bytes, target_res: int = 256) -> bytes:
+def reshape_image(img: bytes, target_res: int = 256) -> Union[None, bytes]:
     channel_count = 3
 
     # decode_bmp, decode_jpeg, and decode_png
     img = tf.io.decode_image(img, expand_animations=False)
     h, w = tf.shape(img)[0], tf.shape(img)[1]
+    if min(h, w) < 256:
+        return None
     s_min = tf.minimum(h, w)
 
     off_h = tf.random.uniform(
