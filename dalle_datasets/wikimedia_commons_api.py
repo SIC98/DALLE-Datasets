@@ -144,7 +144,7 @@ async def crawl_image(tables, seconds):
     results = await try_curl_until_no_error(urls, 'read', seconds)
     print('gathering finished')
 
-    results = [reshape_image(result) for result in results]
+    results = [reshape_image(result, table.mime) for result, table in zip(results, tables)]
     for image, table in zip(results, tables):
         table.image = image
 
