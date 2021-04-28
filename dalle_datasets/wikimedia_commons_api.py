@@ -61,7 +61,7 @@ async def try_curl_until_no_error(urls, return_type, seconds):
             return await asyncio.gather(*[curl(url, return_type) for url in urls])
         except (AssertionError, ClientConnectorError, ClientPayloadError):
             time.sleep(seconds)
-            print(f'sleep: {seconds}')
+            print(f'sleep {seconds} seconds and try again')
             pass
 
 
@@ -145,8 +145,8 @@ async def crawl_image(tables, seconds):
     print('gathering finished')
 
     results = [reshape_image(result) for result in results]
-    for raw_image, table in zip(results, tables):
-        table.raw_image = raw_image
+    for image, table in zip(results, tables):
+        table.image = image
 
 
 async def test_crawl_caption(titles, seconds):
