@@ -142,3 +142,9 @@ cython_debug/
 
 # ini config file
 config.ini
+
+# tmp folder
+tmp/*
+
+# .gitkeep file
+!.gitkeep
