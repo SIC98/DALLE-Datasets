@@ -9,7 +9,8 @@
 ### Download data
 
 - Download link: [wikimedia_commons.csv](https://drive.google.com/file/d/1_plT6RgEiag6IqepKMJphq2wyxnc5hI5/view?usp=sharing)
-- File size: 8.42GB
+- Data count: 30,246,704
+- File size: 7.9GB
 
 ### File summary
 
