@@ -142,7 +142,7 @@ SELECT mime, count(mime) AS count FROM $table GROUP BY mime;
 +---------------+----------+
 ```
 
-11. Crawl image
+11. (WIP) Crawl image
 
 ```bash
 python dalle_datasets/crawl_image.py
